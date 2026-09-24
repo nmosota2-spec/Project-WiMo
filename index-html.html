@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WiMo Business Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+:root{
+  --navy:#12365f;--blue:#2378e8;--green:#18a957;--yellow:#f4c51b;
+  --pink:#f27fa8;--red:#ed3d52;--purple:#7045c8;--orange:#ef7f22;
+  --bg:#f3f8fd;--card:#fff;--text:#17365d;--muted:#64748b;--border:#d8e5f1;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'DM Sans',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.topbar{height:78px;background:linear-gradient(135deg,#153c69,#0d2c50);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:15px}.brand-icon{font-size:34px}.brand h1{margin:0;font-size:24px}.brand small{opacity:.9}
+.topdate{font-weight:600}
+.layout{display:flex;min-height:calc(100vh - 78px)}
+.sidebar{width:205px;background:#12365f;color:#fff;padding:20px 10px;flex-shrink:0}
+.navbtn{width:100%;padding:13px 14px;background:transparent;color:#fff;text-align:left;border-radius:9px;margin:3px 0;font-weight:600}
+.navbtn:hover,.navbtn.active{background:#287be8}
+.navtitle{font-size:12px;opacity:.75;margin:22px 8px 5px;text-transform:uppercase}
+.main{padding:26px;flex:1;min-width:0}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 7px rgba(15,55,90,.04)}
+.panelhead{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.loanhead{background:#eaf5ff}.farmhead{background:#edfdf3}
+.panelhead h2{margin:0;font-size:24px}.panelhead p{margin:4px 0 0;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px 14px 8px}
+.card{padding:16px;border-radius:9px;border:1px solid var(--border);background:#fff;min-height:105px}
+.card .label{font-size:14px;font-weight:700;color:#33516f}.card .value{font-size:22px;font-weight:800;margin-top:15px}
+.green{background:#effbf5}.blue{background:#eef6ff}.orange{background:#fff6ec}.pinkbg{background:#fff0f4}.purplebg{background:#f5efff}
+.actions{display:flex;gap:10px;padding:15px 14px;flex-wrap:wrap}
+.btn{padding:11px 16px;border-radius:8px;font-weight:700}.primary{background:var(--blue);color:#fff}.success{background:var(--green);color:#fff}.danger{background:var(--red);color:#fff}.light{background:#eef5fb;color:var(--text);border:1px solid var(--border)}
+.tablewrap{overflow:auto;padding:0 14px 16px}.table{width:100%;border-collapse:collapse;min-width:720px}.table th,.table td{padding:11px 8px;border-bottom:1px solid #e6eef6;text-align:left;font-size:13px}.table th{background:#f5f9fd;color:#355675}
+.badge{display:inline-block;padding:6px 9px;border-radius:20px;font-size:12px;font-weight:800}.activebadge{background:#dff7e9;color:#087a3c}.soonbadge{background:#fff2a9;color:#775b00}.pinkbadge{background:#ffd3e1;color:#9e2d55}.overduebadge{background:#ffd5db;color:#b10f27}
+.guide{margin:0 14px 18px;padding:14px;border:1px solid var(--border);border-radius:8px;background:#f8fbfe}.guidebar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;height:15px;border-radius:20px;overflow:hidden;margin:12px 0 7px}.g1{background:#3ab96d}.g2{background:#f1c61d}.g3{background:#ef7ca7}.g4{background:#ef3d52}.guidegrid{display:grid;grid-template-columns:repeat(4,1fr);font-size:12px;text-align:center;font-weight:700}.muted{color:var(--muted);font-weight:500}
+.chart{padding:18px 18px 10px}.bararea{height:245px;border:1px solid var(--border);border-radius:8px;padding:18px;display:flex;align-items:flex-end;justify-content:center;gap:80px;background:linear-gradient(#fff,#fbfdff);position:relative}.bararea:before{content:"";position:absolute;left:50px;right:20px;top:25px;bottom:35px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 48px,#e5edf5 49px,#e5edf5 50px);pointer-events:none}.barcol{height:190px;display:flex;align-items:flex-end;gap:30px;z-index:1}.baritem{display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:800}.bar{width:70px;border-radius:6px 6px 0 0}.salesbar{background:#1aaa59}.expensebar{background:#f39a35}.barlabel{font-size:13px}
+.profitbox{margin:0 18px 18px;padding:17px;background:#eefbf4;border:1px solid #cbeed9;border-radius:9px;display:flex;justify-content:space-between;align-items:center}.profitvalue{font-size:26px;font-weight:900}.profit-positive{color:#078443!important}.profit-negative{color:#d11f35!important}
+.form{padding:20px}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;background:#fff}.full{grid-column:1/-1}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.modalbox{background:#fff;border-radius:12px;width:min(650px,100%);max-height:90vh;overflow:auto}.modalhead{padding:17px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}.close{background:none;font-size:25px;color:#64748b}.modalbody{padding:20px}
+.history{padding:18px}.empty{padding:35px;text-align:center;color:var(--muted)}
+.notice{margin:14px;padding:12px;border-radius:8px;background:#fff7df;color:#6e5700;font-size:13px}
+.hidden{display:none!important}
+@media(max-width:1050px){.grid2{grid-template-columns:1fr}.sidebar{width:180px}.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.topbar{padding:0 14px;height:68px}.brand h1{font-size:18px}.brand small{font-size:11px}.topdate{display:none}.layout{display:block}.sidebar{width:100%;display:flex;overflow:auto;padding:8px;gap:5px;position:sticky;top:68px;z-index:10}.navtitle{display:none}.navbtn{width:auto;white-space:nowrap;margin:0;padding:9px 11px}.main{padding:12px}.cards{grid-template-columns:1fr 1fr}.panelhead{padding:16px}.panelhead h2{font-size:20px}.formgrid{grid-template-columns:1fr}.bararea{gap:35px}.bar{width:55px}.table{min-width:680px}}
+
+/* Redesigned dashboard styling */
+body{background:#f4f8fc;color:#0f3158}
+.topbar{height:78px;padding:0 24px;background:linear-gradient(120deg,#173e70 0%,#0d315d 100%);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.brand-icon{font-size:38px;color:#4aa3ff;line-height:1}
+.brand h1{font-size:24px;letter-spacing:-.3px}.brand small{font-size:14px;color:#e6f1ff}
+.header-right{display:flex;align-items:center;gap:16px}.topdate{font-size:15px;font-weight:700}.divider{height:40px;width:1px;background:#5a8fc6}.user-chip{display:flex;align-items:center;gap:10px}.user-chip b{display:block;font-size:14px}.user-chip small{display:block;margin-top:3px;font-size:12px;opacity:.9}.user-avatar{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:20px}.logout-mini{background:transparent;color:#fff;font-size:22px;padding:5px}.cloud-status{display:none}
+.layout{min-height:calc(100vh - 78px)}.sidebar{width:185px;background:#12365f;padding:20px 9px}.navbtn{font-size:14px;padding:12px 13px;border-radius:7px}.navbtn.active{background:#2d7ee7}.navtitle{margin:20px 8px 7px;font-size:11px;font-weight:800;letter-spacing:.3px}.main{padding:22px 18px}.grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.panel{border-radius:8px;border:1px solid #cfe0ef;box-shadow:0 1px 4px rgba(20,70,110,.05)}
+.panelhead{padding:18px 20px}.loanhead{background:linear-gradient(90deg,#e8f5ff,#e3f1fb)}.farmhead{background:linear-gradient(90deg,#eafaf2,#e4f7ef)}.panelhead h2{font-size:23px;text-transform:uppercase;letter-spacing:.2px;color:#0e365f}.panelhead p{font-size:14px;color:#31597c}.cards{gap:12px;padding:14px 14px 8px}.card{min-height:96px;padding:13px 14px;border-radius:8px}.card .label{font-size:13px}.card .value{font-size:21px;margin-top:11px;color:#12365f}.green{background:#e9f8f0;border-color:#bce8d0}.green .value{color:#087a3c}.blue{background:#edf6ff;border-color:#bcdcf7}.blue .value{color:#1266c4}.orange{background:#fff4e9;border-color:#f2d1ad}.orange .value{color:#cc6814}.pinkbg{background:#ffedf3;border-color:#f3c4d4}.pinkbg .value{color:#c82256}.purplebg{background:#f3edff;border-color:#d5c5f2}.purplebg .value{color:#6740b8}
+.tablewrap{padding:0 14px 12px}.tablewrap h3{font-size:17px;margin:12px 0 9px;color:#10365e}.table{min-width:720px}.table th{background:#edf5fc;color:#24496e;font-size:12px}.table td{font-size:12px;padding:10px 7px}.table tr:hover td{background:#f8fbfe}
+.guide{margin:0 14px 16px;background:#eef7fd;border-color:#cce1f1;padding:12px}.guidebar{height:17px;margin:10px 0 8px}.guidegrid{font-size:11px}.chart{padding:14px 14px 8px}.chart-title{display:flex;align-items:center;justify-content:space-between;font-size:16px;color:#12365f;margin-bottom:8px}.chart-period{font-size:12px;font-weight:600;border:1px solid #d7e3ee;border-radius:6px;padding:8px 11px;background:#fff}.bararea{height:235px;gap:55px;border-color:#d7e3ee}.bar{width:55px}.salesbar{background:#1aaa59}.expensebar{background:#f39a35}.barcol{gap:26px}.profitbox{margin:0 14px 12px;padding:14px;background:#e9f9f0;border-color:#c5ead5}.profitvalue{font-size:21px}.profitbox #profitMessage{font-size:12px;color:#2c6148}
+.actions{padding:12px 14px}.btn{border-radius:7px;font-size:13px;padding:10px 14px}.success{background:#19a958}.primary{background:#277be8}.danger{background:#ef3d52}.light{background:#eef5fb}
+/* Make the dashboard resemble the supplied reference while keeping it responsive */
+@media(max-width:1100px){.sidebar{width:175px}.cards{grid-template-columns:repeat(2,1fr)}.panelhead h2{font-size:20px}}
+@media(max-width:760px){.topbar{height:auto;min-height:70px}.header-right .topdate,.divider,.user-chip{display:none}.layout{display:block}.sidebar{width:100%;position:sticky;top:0;z-index:30;display:flex;overflow:auto;padding:7px;gap:4px}.navbtn{white-space:nowrap}.main{padding:10px}.grid2{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.panelhead h2{font-size:18px}.panelhead p{font-size:12px}.table{min-width:760px}}
+
+/* Premium visual refresh */
+:root{
+  --navy:#1b1d20;--blue:#9b6b30;--green:#198754;--yellow:#d8a83e;
+  --pink:#c86b91;--red:#c83b3b;--purple:#7153a8;--orange:#b87532;
+  --bg:#f4f1eb;--card:#fffdf9;--text:#24262a;--muted:#77746e;--border:#e2ddd3;
+  --ink:#202226;--gold:#b88a45;--cream:#f8f5ef;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.topbar{height:82px;background:linear-gradient(120deg,#1c1e21,#292b2f);box-shadow:0 5px 18px rgba(30,27,23,.16);border-bottom:1px solid rgba(255,255,255,.08)}
+.brand h1{color:#fbfaf7;font-weight:800;letter-spacing:-.5px}.brand small{color:#d9c9aa;opacity:1}
+.business-photo-button{border:2px solid #c8a66b;background:#f7f3ea;color:#8a652d;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.header-right{color:#f7f3ea}.topdate{color:#e5ded2}.divider{background:#5b5b5b}.user-avatar{background:#f4efe5;color:#40372b}.logout-mini{color:#e8dfd0}
+.layout{min-height:calc(100vh - 82px)}
+.sidebar{width:195px;background:linear-gradient(180deg,#202226,#17181a);padding:20px 10px;box-shadow:5px 0 20px rgba(0,0,0,.07)}
+.navtitle{color:#b9a98e;opacity:1;letter-spacing:.7px}.navbtn{color:#eeeae2;border-radius:10px}.navbtn:hover{background:#34363a}.navbtn.active{background:linear-gradient(135deg,#b98a4b,#8f662f);color:#fff;box-shadow:0 6px 14px rgba(145,100,43,.24)}
+.main{padding:24px 20px;background:radial-gradient(circle at top right,rgba(208,179,130,.10),transparent 34%),var(--bg)}
+.grid2{gap:18px}.panel{background:rgba(255,253,249,.96);border:1px solid #ddd6ca;border-radius:16px;box-shadow:0 8px 28px rgba(50,42,30,.07)}
+.panelhead{padding:20px 22px;border-bottom:1px solid #e5dfd5}.loanhead{background:linear-gradient(90deg,#f3ede2,#fbf9f4)}.farmhead{background:linear-gradient(90deg,#edf4ef,#f8faf7)}
+.panelhead h2{color:#26282b;font-size:22px;letter-spacing:.3px}.panelhead p{color:#7b766d}
+.cards{gap:12px;padding:16px 14px 8px}.card{background:#fffdf9;border:1px solid #ded8ce;border-radius:13px;box-shadow:0 3px 12px rgba(40,35,28,.035)}
+.card .label{color:#69655e}.card .value{color:#292b2f}.orange{background:#fbf2e7;border-color:#ead2b4}.orange .value{color:#a76024}.blue{background:#f5f0e8;border-color:#ded1ba}.blue .value{color:#87602e}.green{background:#eef7f1;border-color:#cce5d4}.green .value{color:#147845}.pinkbg{background:#fbf0f4;border-color:#e9cbd6}.pinkbg .value{color:#ad365f}.purplebg{background:#f4f0f9;border-color:#ddd2eb}.purplebg .value{color:#684a91}
+.tablewrap{padding:0 14px 14px}.table th{background:#f3f0ea;color:#57534b;border-bottom:1px solid #e1dbd1}.table td{border-bottom:1px solid #eee9e1;color:#37383a}.table tr:hover td{background:#faf7f1}
+.btn{border-radius:10px}.primary{background:#8f662f}.success{background:#198754}.danger{background:#c83b3b}.light{background:#f0ece5;color:#3b3b3a;border:1px solid #ddd6ca}
+.badge{border-radius:999px}.activebadge{background:#dcefe3;color:#176d3f}.soonbadge{background:#f8e9b8;color:#7a5c19}.pinkbadge{background:#f3d9e2;color:#96385c}.overduebadge{background:#f7d4d4;color:#9e2525}
+.chart{padding:16px 14px 10px}.chart-title{color:#302f2c}.chart-period{background:#fffdf9;border-color:#dcd5ca;color:#4e4a43}.bararea{background:linear-gradient(#fffdf9,#f8f5ef);border-color:#ddd6ca}.salesbar{background:#198754}.expensebar{background:#c58a45}.bararea:before{background:repeating-linear-gradient(to bottom,transparent 0,transparent 48px,#e9e3da 49px,#e9e3da 50px)}
+.profitbox{background:#edf7f0;border-color:#c9e4d1}.profit-positive{color:#147845!important}.profit-negative{color:#c12f34!important}
+.record-panel{border-color:#ded8ce;background:#fffdf9;border-radius:13px}.record-head{background:#f3f0ea;border-color:#e2ddd3}.record-head h3{color:#38352f}.record-total{color:#8a632e}
+.form input,.form select,.field input,.field select{border-color:#dcd5ca;background:#fffdf9}.modalbox{border-radius:16px;background:#fffdf9;box-shadow:0 24px 70px rgba(25,23,20,.22)}.modalhead{border-color:#e4ded4}.modalbody{background:#fffdf9}
+.authbox{background:#fffdf9;border:1px solid #e0d8ca;box-shadow:0 24px 70px rgba(20,19,17,.28)}#authScreen{background:radial-gradient(circle at top,#4a4034,#1d1e20 62%)}.authbox h2{color:#292a2c}.authbtn{background:#8f662f}.authsecondary{background:#f0ece5;color:#3f3d39}
+.profile-preview{background:#f3eee5;border-color:#d8c7a9;color:#8a652d}
+.notice{background:#fbf3df;color:#735b2b;border-color:#ead8ac}
+@media(max-width:720px){.topbar{min-height:70px}.sidebar{background:#1d1f22}.main{padding:12px}.panel{border-radius:14px}.panelhead{padding:16px}.cards{gap:10px}}
+
+
+/* WiMo premium profile and branding */
+.brand h1{font-size:22px!important;font-weight:900!important;letter-spacing:.2px!important;background:linear-gradient(90deg,#f7d27a,#fff1b8,#d6a33e,#e9a9c7,#9ed8b5);-webkit-background-clip:text;background-clip:text;color:transparent!important;text-shadow:0 0 16px rgba(216,168,62,.14)}
+.user-avatar{overflow:hidden!important;border:2px solid #c8a66b!important;box-shadow:0 2px 9px rgba(0,0,0,.18)}
+.user-avatar img{width:100%;height:100%;object-fit:cover;display:none}.user-avatar img.show{display:block}
+
+/* FINAL WiMo luxury branding */
+.topbar{height:90px;background:linear-gradient(115deg,#061711 0%,#0b2b20 28%,#174a37 52%,#082019 78%,#123528 100%);border-bottom:1px solid rgba(224,187,72,.72);box-shadow:0 7px 28px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06);padding:0 28px}
+.brand{gap:14px}
+.brand h1{font-family:Georgia,'Times New Roman',serif;font-size:25px;font-weight:900;letter-spacing:.15px;line-height:1.05;background:linear-gradient(90deg,#fff7c9 0%,#f4cf63 18%,#d7a936 38%,#fff1a6 55%,#b88622 76%,#ffe78a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:1px 1px 0 rgba(0,0,0,.35),2px 3px 5px rgba(0,0,0,.45);filter:drop-shadow(0 1px 1px rgba(255,255,255,.18))}
+.brand h1::after{content:'';display:block;height:2px;margin-top:5px;width:100%;background:linear-gradient(90deg,#d6a83a,#fff0a3,#15956a,transparent);border-radius:999px;opacity:.9}
+.brand small{font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:1.7px;text-transform:uppercase;color:#e8d7a0;opacity:1}
+.business-photo-button{width:52px;height:52px;border:2px solid #d7b24c;background:linear-gradient(145deg,#fff9df,#d9b85b);box-shadow:inset 0 1px 1px #fff,0 3px 10px rgba(0,0,0,.35)}
+.header-right{gap:14px}.user-chip{padding:7px 10px;border:1px solid rgba(218,184,86,.38);border-radius:13px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px rgba(255,255,255,.08)}
+.user-avatar{width:42px;height:42px;border:2px solid #d8b24b;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topdate{color:#f5e8b8}.divider{background:rgba(218,184,86,.45)}
+.panel{border-color:#dfd2b2;box-shadow:0 8px 24px rgba(66,52,25,.07)}
+.panelhead h2,.tablewrap h3,.chart-title{font-family:Georgia,'Times New Roman',serif}
+.card{box-shadow:0 4px 13px rgba(72,55,25,.06);border-color:#e0d4b9}
+.btn{box-shadow:0 2px 5px rgba(20,30,25,.08)}
+@media(max-width:720px){.topbar{height:72px;padding:0 10px}.brand h1{font-size:17px;letter-spacing:0}.brand small{font-size:9px;letter-spacing:1px}.business-photo-button{width:43px;height:43px}.user-chip{padding:4px 6px}.user-chip small{max-width:105px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+
+/* Ultra-premium 3D gold wordmark */
+.wimo-brand-title{position:relative;display:flex;align-items:baseline;gap:8px;font-family:Georgia,'Times New Roman',serif;font-size:29px!important;font-weight:900;letter-spacing:.15px;line-height:1.02;color:#f4d477;filter:drop-shadow(0 5px 4px rgba(0,0,0,.34));}
+.wimo-brand-title:before{content:'';position:absolute;left:0;right:0;top:-4px;height:48%;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,0));border-radius:12px;pointer-events:none;opacity:.45;}
+.wimo-brand-title span{position:relative;display:inline-block;background:linear-gradient(180deg,#fffbe0 0%,#ffe78a 13%,#f3c94f 31%,#b77c18 51%,#f8d96b 67%,#fff3b0 82%,#a96e12 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px rgba(126,82,12,.52);text-shadow:0 1px 0 #fff2ad,0 2px 0 #a56c12,0 3px 0 #80500b,0 5px 5px rgba(0,0,0,.42),0 0 16px rgba(239,194,73,.12);}
+.wimo-brand-title .business-word{background:linear-gradient(180deg,#fffce7 0%,#ffe995 13%,#f1c74d 33%,#b77d1c 52%,#f5d66b 69%,#fff4b7 84%,#a97016 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.wimo-brand-title .dashboard-word{background:linear-gradient(180deg,#fffce7 0%,#ffe998 13%,#efc64b 34%,#ad7417 52%,#f4d365 70%,#fff1ad 84%,#9e6811 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.wimo-brand-title:after{content:'';position:absolute;left:1%;right:0;bottom:-8px;height:3px;background:linear-gradient(90deg,#8f5c0e 0%,#f6d76a 18%,#fff5b8 42%,#c89a2d 67%,#17885e 86%,transparent 100%);border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,.45),0 0 8px rgba(237,194,70,.22);}
+.brand small{margin-top:10px!important;display:block;text-shadow:0 1px 2px rgba(0,0,0,.55);}
+.business-photo-button{border-color:#e4c25e;box-shadow:inset 0 1px 1px rgba(255,255,255,.9),0 4px 12px rgba(0,0,0,.38),0 0 0 1px rgba(115,76,10,.25);}
+.header-right .user-chip{box-shadow:inset 0 1px rgba(255,255,255,.12),0 5px 14px rgba(0,0,0,.14);}
+@media(max-width:720px){.topbar{height:74px}.wimo-brand-title{font-size:18px!important;gap:4px}.wimo-brand-title:after{bottom:-6px;height:2px}.brand small{margin-top:7px!important;font-size:8px!important}.wimo-brand-title span{-webkit-text-stroke:.6px rgba(126,82,12,.5);}}
+</style>
+
+<style id="wimo-farm-compact-final">
+/* Compact Farm Produce dashboard: keep the key figures and chart visible with minimal scrolling. */
+#dashboard > .panel:nth-of-type(2){
+  overflow:hidden;
+}
+#dashboard > .panel:nth-of-type(2) .panelhead{padding:12px 18px;}
+#dashboard > .panel:nth-of-type(2) .panelhead h2{font-size:20px;margin:0 0 2px;}
+#dashboard > .panel:nth-of-type(2) .panelhead p{font-size:12px;margin:0;}
+#dashboard > .panel:nth-of-type(2) .panelhead .actions .btn{padding:7px 10px;font-size:12px;}
+#dashboard > .panel:nth-of-type(2) > .cards{grid-template-columns:repeat(3,1fr);gap:9px;padding:9px 12px 6px;}
+#dashboard > .panel:nth-of-type(2) > .cards .card{min-height:68px;padding:9px 12px;border-radius:12px;}
+#dashboard > .panel:nth-of-type(2) > .cards .card .label{font-size:11px;}
+#dashboard > .panel:nth-of-type(2) > .cards .card .value{font-size:18px;margin-top:6px;}
+#dashboard > .panel:nth-of-type(2) .chart{padding:6px 12px 4px;}
+#dashboard > .panel:nth-of-type(2) .chart-title{font-size:13px;margin-bottom:4px;}
+#dashboard > .panel:nth-of-type(2) .chart-period{font-size:10px;padding:4px 7px;}
+#dashboard > .panel:nth-of-type(2) .bararea{height:135px;padding:8px 12px;gap:35px;}
+#dashboard > .panel:nth-of-type(2) .barcol{height:105px;gap:22px;}
+#dashboard > .panel:nth-of-type(2) .bar{width:42px;}
+#dashboard > .panel:nth-of-type(2) .baritem{gap:4px;font-size:10px;}
+#dashboard > .panel:nth-of-type(2) .barlabel{font-size:10px;}
+#dashboard > .panel:nth-of-type(2) .profitbox{margin:0 12px 7px;padding:8px 11px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+#dashboard > .panel:nth-of-type(2) .profitbox b{font-size:11px;}
+#dashboard > .panel:nth-of-type(2) .profitvalue{font-size:17px;}
+#dashboard > .panel:nth-of-type(2) #profitMessage{font-size:11px;font-weight:800;text-align:right;}
+#dashboard > .panel:nth-of-type(2) > .actions{padding:5px 12px 9px;}
+#dashboard > .panel:nth-of-type(2) > .actions .btn{padding:7px 10px;font-size:11px;}
+#dashboard > .panel:nth-of-type(2) #profitMessage.profit-positive{color:#168447!important;}
+#dashboard > .panel:nth-of-type(2) #profitMessage.profit-negative{color:#d52f45!important;}
+@media(max-width:720px){
+  #dashboard > .panel:nth-of-type(2) .panelhead{padding:11px 12px;}
+  #dashboard > .panel:nth-of-type(2) > .cards{gap:7px;padding:8px 10px 5px;}
+  #dashboard > .panel:nth-of-type(2) > .cards .card{min-height:62px;padding:8px 9px;}
+  #dashboard > .panel:nth-of-type(2) > .cards .card .value{font-size:16px;}
+  #dashboard > .panel:nth-of-type(2) .bararea{height:120px;gap:20px;}
+  #dashboard > .panel:nth-of-type(2) .barcol{height:92px;gap:16px;}
+  #dashboard > .panel:nth-of-type(2) .bar{width:36px;}
+}
+
+/* Final compact Farm Produce layout: key figures + pie chart fit in one view. */
+#dashboard > .panel:nth-of-type(2){align-self:start;}
+#dashboard > .panel:nth-of-type(2) .farm-pie-chart{height:auto;min-height:0;}
+#dashboard > .panel:nth-of-type(2) .pie-wrap{min-height:92px;}
+#dashboard > .panel:nth-of-type(2) .profitbox{margin-top:2px;}
+
+#dashboard > .panel:nth-of-type(2){padding-bottom:4px;}
+#dashboard > .panel:nth-of-type(2) > .cards{grid-template-columns:repeat(3,minmax(0,1fr));}
+#dashboard > .panel:nth-of-type(2) .farm-pie-chart{padding:2px 12px 0;}
+#dashboard > .panel:nth-of-type(2) .pie-wrap{min-height:82px;gap:16px;}
+#dashboard > .panel:nth-of-type(2) .pie{width:72px;height:72px;}
+#dashboard > .panel:nth-of-type(2) .pie:after{width:34px;height:34px;}
+#dashboard > .panel:nth-of-type(2) .pie-center{font-size:9px;}
+#dashboard > .panel:nth-of-type(2) .pie-legend{gap:5px;font-size:10px;min-width:130px;}
+#dashboard > .panel:nth-of-type(2) .profitbox{margin:2px 12px 5px;padding:6px 10px;}
+#dashboard > .panel:nth-of-type(2) > .actions{padding:3px 12px 6px;}
+@media(max-width:720px){#dashboard > .panel:nth-of-type(2) > .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;}#dashboard > .panel:nth-of-type(2) > .cards .card{min-height:58px;padding:7px 6px;}#dashboard > .panel:nth-of-type(2) > .cards .card .label{font-size:9px;}#dashboard > .panel:nth-of-type(2) > .cards .card .value{font-size:14px;}#dashboard > .panel:nth-of-type(2) .pie-wrap{min-height:76px;gap:10px;}#dashboard > .panel:nth-of-type(2) .pie{width:64px;height:64px;}#dashboard > .panel:nth-of-type(2) .pie:after{width:30px;height:30px;}#dashboard > .panel:nth-of-type(2) .pie-legend{min-width:110px;font-size:9px;}}
+
+/* Compact Farm Produce: replace the tall bar graph with a small pie chart. */
+#dashboard > .panel:nth-of-type(2) .farm-pie-chart{padding:5px 12px 2px;}
+#dashboard > .panel:nth-of-type(2) .pie-wrap{display:flex;align-items:center;justify-content:center;gap:18px;min-height:104px;}
+#dashboard > .panel:nth-of-type(2) .pie{width:92px;height:92px;border-radius:50%;background:conic-gradient(#198754 0deg 180deg,#c58a45 180deg 360deg);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 3px 10px rgba(0,0,0,.12);flex:none;}
+#dashboard > .panel:nth-of-type(2) .pie:after{content:"";position:absolute;width:46px;height:46px;border-radius:50%;background:#fffdf9;}
+#dashboard > .panel:nth-of-type(2) .pie-center{position:relative;z-index:1;font-size:10px;font-weight:800;color:#4e4a43;}
+#dashboard > .panel:nth-of-type(2) .pie-legend{display:flex;flex-direction:column;gap:9px;font-size:11px;min-width:145px;}
+#dashboard > .panel:nth-of-type(2) .pie-legend>div{display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:6px;}
+#dashboard > .panel:nth-of-type(2) .legend-dot{width:9px;height:9px;border-radius:50%;display:block;}
+#dashboard > .panel:nth-of-type(2) .sales-dot{background:#198754;}
+#dashboard > .panel:nth-of-type(2) .expense-dot{background:#c58a45;}
+@media(max-width:720px){#dashboard > .panel:nth-of-type(2) .pie-wrap{min-height:94px;gap:14px;}#dashboard > .panel:nth-of-type(2) .pie{width:78px;height:78px;}#dashboard > .panel:nth-of-type(2) .pie:after{width:39px;height:39px;}#dashboard > .panel:nth-of-type(2) .pie-legend{min-width:125px;font-size:10px;gap:7px;}}
+
+/* WiMo premium brand finish */
+.wimo-brand-title{display:flex;align-items:baseline;gap:7px;margin:0;font-size:25px!important;font-weight:900;letter-spacing:.2px;font-family:Georgia,"Times New Roman",serif;line-height:1.05;text-shadow:0 2px 0 rgba(0,0,0,.28),0 4px 9px rgba(0,0,0,.28);filter:drop-shadow(0 1px 1px rgba(255,255,255,.18));}
+.wimo-word{background:linear-gradient(180deg,#fff7c7 0%,#f7d96b 30%,#c99524 62%,#fff0a5 82%,#b67a16 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.25),0 2px 3px rgba(70,45,8,.65);}
+.business-word{background:linear-gradient(180deg,#dfffe9 0%,#62d89a 45%,#15945b 70%,#b9f7d3 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 3px rgba(0,45,27,.55);}
+.dashboard-word{background:linear-gradient(180deg,#ffffff 0%,#ffe9a8 45%,#e7bf58 72%,#fff6d0 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 3px rgba(55,39,10,.58);}
+.brand small{color:#f7edc6!important;font-weight:700;letter-spacing:.35px;text-shadow:0 1px 2px rgba(0,0,0,.35);}
+@media(max-width:760px){.wimo-brand-title{font-size:19px!important;gap:4px;}.brand{gap:9px;}.brand small{font-size:10px;}}
+/* Premium Farm Produce */
+#dashboard > .panel:nth-of-type(2){border:1px solid #d7bd6b;background:linear-gradient(145deg,#fffdf6,#f8f3e5);box-shadow:0 10px 28px rgba(116,84,20,.13),inset 0 1px rgba(255,255,255,.9);}
+#dashboard > .panel:nth-of-type(2) .farmhead{background:linear-gradient(135deg,#fff7d8 0%,#e8f8ed 52%,#fdf4d9 100%);border-bottom-color:#decf9b;}
+#dashboard > .panel:nth-of-type(2) .farmhead h2{color:#176342;text-shadow:0 1px 0 #fff;font-family:Georgia,"Times New Roman",serif;letter-spacing:.2px;}
+#dashboard > .panel:nth-of-type(2) .farmhead p{color:#7b6330;font-weight:600;}
+#dashboard > .panel:nth-of-type(2) > .cards .card{background:linear-gradient(145deg,#fffef8,#f3ead0);border-color:#e1ce93;box-shadow:0 4px 12px rgba(103,76,25,.08);}
+#dashboard > .panel:nth-of-type(2) > .cards .card .label{color:#80652e;font-weight:800;}
+#dashboard > .panel:nth-of-type(2) > .cards .card .value{color:#175e43;font-weight:900;text-shadow:0 1px 0 #fff;}
+#dashboard > .panel:nth-of-type(2) .pie-wrap{background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(250,244,222,.78));border:1px solid #ead8a7;border-radius:14px;box-shadow:inset 0 1px rgba(255,255,255,.9);}
+#dashboard > .panel:nth-of-type(2) .pie{box-shadow:0 5px 15px rgba(81,60,20,.16),inset 0 1px rgba(255,255,255,.45);}
+#dashboard > .panel:nth-of-type(2) .pie-legend b{color:#195b42;}
+#dashboard > .panel:nth-of-type(2) .pie-legend span:last-child{color:#7b6330;font-weight:800;}
+#dashboard > .panel:nth-of-type(2) .profitbox{background:linear-gradient(135deg,#eefaf2,#fff8df);border:1px solid #d7c47f;box-shadow:0 3px 10px rgba(80,60,20,.07);}
+#dashboard > .panel:nth-of-type(2) .profitbox b{color:#195b42;}
+#dashboard > .panel:nth-of-type(2) #profitMessage{color:#80652e;}
+</style>
+
+<style id="wimo-final-metallic-bars">
+/* Final WiMo metallic-gold luxury finish */
+.wimo-brand-title{position:relative;gap:9px;letter-spacing:.35px;transform:perspective(500px) rotateX(2deg);filter:drop-shadow(0 7px 4px rgba(0,0,0,.45));}
+.wimo-brand-title span{position:relative;-webkit-text-stroke:1px rgba(92,58,8,.8);background-size:100% 220%;animation:wimoGoldShine 7s ease-in-out infinite;text-shadow:0 1px 0 #fffbe0,0 2px 0 #d8a62f,0 3px 0 #9a6410,0 4px 0 #70450b,0 7px 7px rgba(0,0,0,.48),0 0 18px rgba(255,213,91,.22);}
+.wimo-brand-title .wimo-word{background-image:linear-gradient(180deg,#fffbe7 0%,#fff3ad 9%,#e5b83f 23%,#fff8cf 37%,#b9790d 51%,#f0c84f 63%,#fff7c5 77%,#a96509 91%,#fff0a0 100%);}
+.wimo-brand-title .business-word{background-image:linear-gradient(180deg,#fffbe7 0%,#fff3ad 9%,#e0ae35 24%,#fff8cc 38%,#a86d0c 52%,#e4b53a 65%,#fff5bd 79%,#925b08 92%,#ffe997 100%);}
+.wimo-brand-title .dashboard-word{background-image:linear-gradient(180deg,#fffbe7 0%,#fff0aa 9%,#dcae35 24%,#fff8cd 38%,#9d650c 52%,#e8bd49 65%,#fff4ba 79%,#8f5908 92%,#ffe99a 100%);}
+.wimo-brand-title:before{content:'';position:absolute;left:0;right:0;top:-3px;height:42%;background:linear-gradient(180deg,rgba(255,255,255,.62),rgba(255,255,255,0));border-radius:10px;pointer-events:none;mix-blend-mode:screen;z-index:2;}
+.wimo-brand-title:after{height:4px;bottom:-9px;background:linear-gradient(90deg,#5b3605,#b77b12,#fff4a9,#d5a42f,#fff8cf,#9a650b,#157a50,transparent);box-shadow:0 1px 0 #fff1a1,0 2px 4px rgba(0,0,0,.45),0 0 12px rgba(239,194,73,.35);}
+@keyframes wimoGoldShine{0%,55%,100%{background-position:50% 0}70%{background-position:50% 100%}}
+.farm-bar-chart{padding:5px 12px 4px!important;}
+.farm-bars{display:flex;align-items:flex-end;justify-content:center;gap:48px;height:118px;padding:8px 18px 4px;background:linear-gradient(180deg,#fffef9,#f6f0df);border:1px solid #ead8a7;border-radius:14px;box-shadow:inset 0 1px rgba(255,255,255,.9);}
+.farm-bar-item{height:100%;width:88px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;color:#195b42;font-size:10px;}
+.farm-bar-value{font-size:10px;font-weight:900;color:#74541d;white-space:nowrap;}
+.farm-bar-track{height:78px;width:42px;display:flex;align-items:flex-end;justify-content:center;background:repeating-linear-gradient(to top,rgba(224,211,172,.28) 0,rgba(224,211,172,.28) 1px,transparent 1px,transparent 19px);border-radius:8px 8px 3px 3px;overflow:hidden;}
+.farm-bar-fill{width:100%;height:0;min-height:3px;border-radius:8px 8px 2px 2px;transition:height .35s ease;box-shadow:inset 0 1px rgba(255,255,255,.65),0 3px 8px rgba(60,45,15,.16);}
+.sales-fill{background:linear-gradient(180deg,#b9f2d1 0%,#31ad70 38%,#0e7146 100%);}
+.expense-fill{background:linear-gradient(180deg,#fff0b0 0%,#d8a63c 38%,#98620b 100%);}
+@media(max-width:720px){.wimo-brand-title{font-size:18px!important;gap:4px}.wimo-brand-title span{-webkit-text-stroke:.7px rgba(92,58,8,.8)}.farm-bars{gap:28px;height:105px;padding-left:8px;padding-right:8px}.farm-bar-item{width:72px}.farm-bar-track{width:34px;height:68px}.farm-bar-value{font-size:9px}}
+</style>
+
+<style id="wimo-standalone-multicolor-metallic">
+/* Standalone WiMo title: no highlight panel, no underline, metallic 3D letters. */
+.wimo-brand-title{position:relative;display:flex;align-items:baseline;flex-wrap:wrap;gap:9px;margin:0;padding:0;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;filter:none!important;font-family:Georgia,"Times New Roman",serif;font-size:27px!important;font-weight:900;letter-spacing:.2px;line-height:1.02;color:#fff;}
+.wimo-brand-title:before,.wimo-brand-title:after{display:none!important;content:none!important;}
+.wimo-brand-title>span{display:inline-flex;align-items:baseline;gap:0;background:none!important;-webkit-text-stroke:0!important;text-shadow:none!important;color:inherit;}
+.wimo-brand-title>span>span,.wimo-brand-title>span:first-letter{font-weight:900;}
+.wimo-brand-title>span{
+  --metal-a:#fff7d0;--metal-b:#d9a52d;--metal-c:#7f4f09;--metal-d:#fff1a0;
+}
+.wimo-brand-title>span,.wimo-brand-title>span>span{
+  background:linear-gradient(180deg,var(--metal-a) 0%,#ffffff 10%,var(--metal-b) 27%,var(--metal-c) 49%,var(--metal-b) 62%,var(--metal-d) 78%,#8b570b 93%,#f7d66b 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
+  -webkit-text-stroke:1px rgba(74,45,5,.7)!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.95),0 2px 0 rgba(126,78,8,.9),0 3px 0 rgba(74,45,5,.75),0 5px 5px rgba(0,0,0,.42),0 0 10px rgba(255,215,100,.18)!important;
+}
+.wimo-brand-title .wimo-word{--metal-a:#fff8cf;--metal-b:#e1ad31;--metal-c:#89540a;--metal-d:#fff0a0;}
+.wimo-brand-title .business-word{--metal-a:#e9fff4;--metal-b:#39b979;--metal-c:#075b39;--metal-d:#c5f6d9;}
+.wimo-brand-title .dashboard-word{--metal-a:#f5eaff;--metal-b:#a875d4;--metal-c:#4d236f;--metal-d:#e4c8ff;}
+.wimo-brand-title .wimo-word span:nth-child(1){--metal-b:#d7a72f;}
+.wimo-brand-title .wimo-word span:nth-child(2){--metal-b:#20a86b;--metal-c:#075d3a;--metal-d:#b9f3d2;}
+.wimo-brand-title .business-word span:nth-child(1){--metal-b:#d94b68;--metal-c:#74152d;--metal-d:#ffc0cc;}
+.wimo-brand-title .business-word span:nth-child(2){--metal-b:#3d9be0;--metal-c:#124d7c;--metal-d:#b9e5ff;}
+.wimo-brand-title .business-word span:nth-child(3){--metal-b:#e2a42e;--metal-c:#7b4a06;--metal-d:#fff0a1;}
+.wimo-brand-title .business-word span:nth-child(4){--metal-b:#23a66b;--metal-c:#075d3a;--metal-d:#baf2d2;}
+.wimo-brand-title .business-word span:nth-child(5){--metal-b:#d35dcb;--metal-c:#6c1d68;--metal-d:#f4c9f0;}
+.wimo-brand-title .business-word span:nth-child(6){--metal-b:#df9b34;--metal-c:#774707;--metal-d:#ffe8a0;}
+.wimo-brand-title .dashboard-word span:nth-child(1){--metal-b:#2fa9c9;--metal-c:#0d5367;--metal-d:#bcefff;}
+.wimo-brand-title .dashboard-word span:nth-child(2){--metal-b:#dfad2f;--metal-c:#7b4a06;--metal-d:#fff0a1;}
+.wimo-brand-title .dashboard-word span:nth-child(3){--metal-b:#e05c77;--metal-c:#79172f;--metal-d:#ffc2cf;}
+.wimo-brand-title .dashboard-word span:nth-child(4){--metal-b:#55a95b;--metal-c:#205d26;--metal-d:#c7f1c8;}
+.wimo-brand-title .dashboard-word span:nth-child(5){--metal-b:#b477d2;--metal-c:#52206f;--metal-d:#e7caff;}
+.wimo-brand-title .dashboard-word span:nth-child(6){--metal-b:#d99b30;--metal-c:#744507;--metal-d:#ffeaa5;}
+.wimo-brand-title .dashboard-word span:nth-child(7){--metal-b:#3f91d4;--metal-c:#164d7a;--metal-d:#bde2ff;}
+.wimo-brand-title .dashboard-word span:nth-child(8){--metal-b:#20a96e;--metal-c:#075d3b;--metal-d:#bdf3d5;}
+@media(max-width:760px){.wimo-brand-title{font-size:18px!important;gap:5px;letter-spacing:0}.wimo-brand-title>span>span,.wimo-brand-title>span{ -webkit-text-stroke:.7px rgba(74,45,5,.7)!important;text-shadow:0 1px 0 rgba(255,255,255,.9),0 2px 0 rgba(80,45,5,.8),0 4px 4px rgba(0,0,0,.35)!important;}}
+</style>
+
+</head>
+<body><style>
+#authScreen{position:fixed;inset:0;background:linear-gradient(135deg,#12365f,#0d2c50);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.authbox{width:min(430px,100%);background:#fff;border-radius:18px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.authbox h2{margin:0 0 6px;color:#12365f}.authbox p{color:#64748b;margin:0 0 20px}
+.authbox input{width:100%;padding:13px;border:1px solid #d8e5f1;border-radius:9px;margin:7px 0}
+.authbtn,.authsecondary{width:100%;padding:13px;border-radius:9px;font-weight:800;margin-top:8px}
+.authbtn{background:#2378e8;color:#fff}.authsecondary{background:#eef5fb;color:#17365d}
+.authmsg{margin-top:12px;padding:10px;border-radius:8px;font-size:13px;display:none}
+.authmsg.show{display:block;background:#fff0f2;color:#b10f27}
+#app{display:none}
+
+.business-photo-button{width:48px;height:48px;border-radius:50%;padding:0;border:2px solid rgba(255,255,255,.65);background:#fff;color:#2378e8;display:grid;place-items:center;overflow:hidden;flex-shrink:0}.business-photo-button img{width:100%;height:100%;object-fit:cover;display:none}.business-photo-button img.show{display:block}.business-photo-button span{font-size:27px}.business-photo-button span.hide{display:none}.profile-upload{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.profile-preview{width:86px;height:86px;border-radius:50%;background:#eef6ff;border:2px solid #c6dff4;display:grid;place-items:center;overflow:hidden;color:#2378e8;font-size:42px}.profile-preview img{width:100%;height:100%;object-fit:cover;display:none}.profile-preview img.show{display:block}.profile-preview span.hide{display:none}.profile-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.profile-status{font-size:12px;color:#2f6b4a;margin-top:8px;min-height:16px}
+.farm-record-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 14px 16px}.record-panel{border:1px solid var(--border);border-radius:9px;background:#fff;overflow:hidden}.record-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;background:#f5f9fd;border-bottom:1px solid var(--border)}.record-head h3{margin:0;color:#10365e;font-size:16px}.record-total{font-weight:800;color:#12365f}.record-panel .tablewrap{padding:0;max-height:330px;overflow:auto}.record-panel .table{min-width:520px}.record-panel .table td,.record-panel .table th{padding:9px 7px}.record-panel .btn{padding:7px 10px;font-size:12px}
+@media(max-width:900px){.farm-record-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.farm-record-grid{padding:0 10px 12px}.record-panel .table{min-width:480px}}
+
+/* Premium borrower portal */
+.borrower-portal{min-height:100vh;padding:28px 18px;background:radial-gradient(circle at 15% 0%,rgba(207,169,76,.18),transparent 30%),linear-gradient(135deg,#071f18 0%,#0d3a2c 48%,#f5efe2 48%,#f8f3e9 100%);color:#1f2d27}
+.borrower-shell{max-width:980px;margin:0 auto;background:rgba(255,253,248,.97);border:1px solid rgba(190,153,65,.34);border-radius:26px;overflow:hidden;box-shadow:0 25px 70px rgba(6,35,26,.24)}
+.borrower-hero{padding:26px 28px;background:linear-gradient(135deg,#082d22,#126044 58%,#b68a36);color:white;display:flex;justify-content:space-between;align-items:center;gap:18px;position:relative;overflow:hidden}
+.borrower-hero:after{content:"";position:absolute;width:230px;height:230px;border-radius:50%;right:-70px;top:-105px;background:rgba(255,255,255,.09)}
+.borrower-brand{font:800 30px Georgia,serif;letter-spacing:1px;color:#f3d77e;text-shadow:0 2px 8px rgba(0,0,0,.28)}
+.borrower-title{font:800 22px Georgia,serif;margin-top:3px;letter-spacing:.3px}.borrower-subtitle{opacity:.82;margin-top:5px;font-size:13px}
+.borrower-logout{position:relative;z-index:2;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;padding:10px 15px;border-radius:12px;font-weight:800;cursor:pointer;backdrop-filter:blur(8px)}
+.borrower-live{display:flex;justify-content:space-between;align-items:center;padding:12px 28px;background:#fffaf0;border-bottom:1px solid #eadfc9;color:#705b32;font-size:12px;font-weight:800}.borrower-live span:last-child{color:#174f3c}
+.borrower-content{padding:24px 28px}.borrower-content h2{font:800 25px Georgia,serif;color:#164b39;margin:0 0 18px}.borrower-content .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.borrower-content .card{border:1px solid #dfd2b3!important;border-radius:17px!important;background:linear-gradient(145deg,#fffdf8,#f5eee0)!important;box-shadow:0 9px 22px rgba(70,52,24,.08)!important}.borrower-content .card:nth-child(1){border-top:4px solid #b28a3d!important}.borrower-content .card:nth-child(2){border-top:4px solid #2f8a64!important}.borrower-content .card:nth-child(3){border-top:4px solid #d17c55!important}.borrower-content .card:nth-child(4){border-top:4px solid #6577b8!important}.borrower-content .panel{background:#fffefa!important;border:1px solid #e3d7bd!important;border-radius:17px!important;box-shadow:0 8px 22px rgba(70,52,24,.06)!important;padding:20px!important}.borrower-content .panel h3{font-family:Georgia,serif;color:#174f3c;margin-top:0}.borrower-content .panel p{border-bottom:1px solid #f0e9da;padding:7px 0;margin:0}.borrower-content .panel p:last-child{border-bottom:0}.borrower-content .badge{display:inline-block;padding:5px 10px;border-radius:999px}
+.borrower-loan-cards{grid-template-columns:repeat(3,minmax(0,1fr))!important}.borrower-content .interest-card{border-top:4px solid #c58a45!important;box-shadow:0 10px 26px rgba(197,138,69,.16)!important}.interest-note{margin:14px 0 0;padding:14px 16px;border:1px solid rgba(197,138,69,.38);border-radius:16px;background:linear-gradient(135deg,#fffaf0,#f5fff8);color:#30443b;font-size:.92rem;line-height:1.55;box-shadow:0 7px 18px rgba(70,52,24,.05)}.borrower-content .info-panels{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}.borrower-content .info-panels .panel{margin-top:0!important;height:100%;box-sizing:border-box}.borrower-content .info-panels .panel h3{font-size:18px}.borrower-content .info-panels .panel p{font-size:13px}
+@media(max-width:900px){.borrower-content .info-panels{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.borrower-portal{padding:12px}.borrower-hero{padding:20px}.borrower-content{padding:18px}.borrower-content .cards,.borrower-loan-cards{grid-template-columns:1fr 1fr!important}.borrower-content .info-panels{grid-template-columns:1fr}.borrower-title{font-size:18px}.borrower-brand{font-size:26px}.borrower-live{padding:10px 18px}}
+@media(max-width:460px){.borrower-content .cards,.borrower-loan-cards{grid-template-columns:1fr!important}.borrower-hero{align-items:flex-start}.borrower-logout{padding:8px 10px}}
+/* Premium Loans dashboard */
+.panel.loan-panel, #dashboard .panel:first-of-type, #loans .panel:first-of-type { 
+  border:1px solid rgba(181,142,52,.28)!important;
+  box-shadow:0 18px 45px rgba(17,57,43,.10), 0 3px 10px rgba(181,142,52,.08)!important;
+  border-radius:18px!important; overflow:hidden;
+}
+.loanhead{background:linear-gradient(135deg,#0b3b2e 0%,#145b45 48%,#b08a3c 100%)!important;color:#fff!important;position:relative;}
+.loanhead:after{content:"";position:absolute;inset:auto -40px -55px auto;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08);}
+.loanhead h2{color:#fff!important;font-size:24px!important;letter-spacing:.8px!important;text-shadow:0 2px 7px rgba(0,0,0,.28);}
+.loanhead p{color:rgba(255,255,255,.82)!important;}
+.loan-summary-cards .card{border-radius:15px!important;border-width:1px!important;box-shadow:0 8px 22px rgba(20,60,45,.08);transition:transform .18s,box-shadow .18s;}
+.loan-summary-cards .card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(20,60,45,.13);}
+.loan-summary-cards .card .value{font-weight:800;letter-spacing:.2px;}
+.loan-summary-cards .green{background:linear-gradient(145deg,#effaf4,#dff4e9)!important;border-color:#a8dcc0!important;}
+.loan-summary-cards .blue{background:linear-gradient(145deg,#f3f8ff,#e2efff)!important;border-color:#b6d5f2!important;}
+.loan-summary-cards .orange{background:linear-gradient(145deg,#fff8ee,#ffedd8)!important;border-color:#efcda4!important;}
+.loan-summary-cards .pinkbg{background:linear-gradient(145deg,#fff3f7,#ffe3ec)!important;border-color:#edbfd0!important;}
+.loan-summary-cards .purplebg{background:linear-gradient(145deg,#f8f3ff,#eee4ff)!important;border-color:#d4c2ee!important;}
+.tablewrap{border-radius:16px!important;box-shadow:0 8px 24px rgba(20,60,45,.06);}
+.tablewrap h3{color:#164d3b!important;font-weight:800!important;}
+.table thead th{background:linear-gradient(180deg,#f7f1e5,#eee7d8)!important;color:#4a3a20!important;font-weight:800!important;}
+.table tbody tr:hover{background:#fbf8f0!important;}
+.badge{font-weight:800!important;box-shadow:0 2px 6px rgba(0,0,0,.07);}
+</style><div id="authScreen"><div class="authbox">
+<h2>WiMo Business Dashboard</h2>
+<p>Sign in to access your cloud-saved Loans and Farm Produce data.</p>
+<input id="authEmail" type="email" placeholder="Email address">
+<input id="authPassword" type="password" placeholder="Password">
+<button class="authbtn" id="loginBtn">Sign In</button>
+<button class="authsecondary" id="googleBtn">Continue with Google</button>
+<button class="authsecondary" id="signupBtn">Create Account</button>
+<button class="authsecondary" id="resetBtn">Reset Password</button>
+<div id="authMsg" class="authmsg"></div>
+<div style="margin-top:16px;font-size:12px;color:#64748b">Your data is stored in Firebase and can be accessed from any device after signing in.</div>
+</div></div><div id="borrowerPortal" class="borrower-portal" style="display:none"><div class="borrower-shell"><div class="borrower-hero"><div><div class="borrower-brand">WiMo</div><div class="borrower-title">Personal Loan Dashboard</div><div class="borrower-subtitle">Your private loan information</div></div><button class="borrower-logout" id="borrowerLogout">Log out</button></div><div class="borrower-live"><span>Live account</span><span id="borrowerPortalTime"></span></div><div id="borrowerContent" class="borrower-content"></div></div></div><div id="app">
+<header class="topbar">
+  <div class="brand"><button class="business-photo-button" id="headerBusinessPhoto" onclick="showPage('settings',this)" title="Business profile picture"><img id="headerBusinessImage" alt="Business profile"><span id="headerBusinessFallback">▥</span></button><div><h1 class="wimo-brand-title" aria-label="WiMo Business Dashboard">
+  <span class="wimo-word">W<span>i</span>M<span>o</span></span>
+  <span class="business-word">B<span>u</span>s<span>i</span>n<span>e</span>s<span>s</span></span>
+  <span class="dashboard-word">D<span>a</span>s<span>h</span>b<span>o</span>a<span>r</span>d</span>
+</h1><small>Loans &nbsp;|&nbsp; Farm Produce</small></div></div>
+  <div class="header-right"><span class="topdate" id="todayText"></span><span class="divider"></span><div class="user-chip"><span class="user-avatar"><img id="userProfileImage" alt="Profile photo"><span id="userAvatarFallback">👤</span></span><div><b>Good Morning</b><small id="userEmailTop">User</small></div></div><button class="logout-mini" id="logoutBtn" title="Log out">⌄</button><span id="cloudStatus" class="cloud-status">Cloud</span></div>
+</header>
+<div class="layout">
+<aside class="sidebar">
+  <button class="navbtn active" onclick="showPage('dashboard',this)">⌂ &nbsp; Dashboard</button>
+  <div class="navtitle">Loans</div>
+  <button class="navbtn" onclick="openLoanModal()">＋ &nbsp; Add New Loan</button>
+  <button class="navbtn" onclick="showPage('loans',this)">▤ &nbsp; All Loans</button>
+  <button class="navbtn" onclick="showPage('history',this)">◷ &nbsp; Loan History</button>
+  <button class="navbtn" onclick="showPage('cleared',this)">✓ &nbsp; Cleared Loans</button>
+  <div class="navtitle">Farm Produce</div>
+  <button class="navbtn" onclick="openSaleModal()">＋ &nbsp; Add Sale</button>
+  <button class="navbtn" onclick="openExpenseModal()">＋ &nbsp; Add Expense</button>
+  <button class="navbtn" onclick="showPage('farm',this)">▥ &nbsp; Farm Reports</button>
+  <div class="navtitle">System</div>
+  <button class="navbtn" onclick="showPage('settings',this)">⚙ &nbsp; Settings</button>
+</aside>
+<main class="main">
+
+<section id="dashboard">
+<div class="grid2">
+<section class="panel">
+  <div class="panelhead loanhead"><div><h2>Loans</h2><p>Track your loans, repayments and penalties</p></div></div>
+  <div class="cards loan-summary-cards">
+    <div class="card orange"><div class="label">Outstanding Balance</div><div class="value" id="outstanding">KSh 0</div></div>
+    <div class="card blue"><div class="label">Total Amount Issued</div><div class="value" id="totalIssued">KSh 0</div></div>
+    <div class="card green"><div class="label">Total Amount Received</div><div class="value" id="totalReceived">KSh 0</div></div>
+    <div class="card pinkbg"><div class="label">Total Overdue</div><div class="value" id="overdue">KSh 0</div></div>
+    <div class="card purplebg"><div class="label">Total Penalties</div><div class="value" id="penalties">KSh 0</div></div>
+  </div>
+  <div class="tablewrap"><h3>Recent Loans</h3><table class="table"><thead><tr><th>#</th><th>Customer Name</th><th>Phone</th><th>Loan Applied</th><th>Loan Issued</th><th>Given to Customer</th><th>Days Remaining</th><th>Status</th><th>Action</th></tr></thead><tbody id="loanRows"></tbody></table></div>
+  
+</section>
+
+<section class="panel">
+  <div class="panelhead farmhead"><div><h2>Farm Produce</h2><p>Track sales, expenses and your profit/loss</p></div><div class="actions" style="padding:0"><button class="btn success" onclick="openSaleModal()">＋ Add Sale</button><button class="btn light" onclick="openExpenseModal()">＋ Add Expense</button></div></div>
+  <div class="cards">
+    <div class="card green"><div class="label">Total Sales</div><div class="value" id="farmSales">KSh 0</div></div>
+    <div class="card pinkbg"><div class="label">Total Expenses</div><div class="value" id="farmExpenses">KSh 0</div></div>
+    <div class="card purplebg"><div class="label">Profit / Loss</div><div class="value" id="farmProfit">KSh 0</div></div>
+  </div>
+  <div class="chart farm-bar-chart"><div class="chart-title"><b>Farm Sales & Expenses</b><span class="chart-period">Sales vs Expenses</span></div><div class="farm-bars"><div class="farm-bar-item"><div class="farm-bar-value" id="salesLabel">KSh 0</div><div class="farm-bar-track"><div class="farm-bar-fill sales-fill" id="farmSalesBar"></div></div><b>Sales</b></div><div class="farm-bar-item"><div class="farm-bar-value" id="expenseLabel">KSh 0</div><div class="farm-bar-track"><div class="farm-bar-fill expense-fill" id="farmExpenseBar"></div></div><b>Expenses</b></div></div></div>
+  <div class="profitbox"><div><b id="profitHeading">Current Profit / Loss</b><div class="profitvalue" id="profitBox">KSh 0</div></div><div id="profitMessage">Start recording your farm activity.</div></div>
+  <div class="actions"><button class="btn success" onclick="openSaleModal()">＋ Add Sale</button><button class="btn light" onclick="openExpenseModal()">＋ Add Expense</button></div>
+</section>
+</div>
+</section>
+
+<section id="loans" class="hidden"><section class="panel"><div class="panelhead loanhead"><div><h2>All Loans</h2><p>Manage active loans and repayments</p></div><button class="btn primary" onclick="openLoanModal()">＋ Add New Loan</button></div><div class="tablewrap"><table class="table"><thead><tr><th>Customer</th><th>Phone</th><th>Loan Applied</th><th>Loan Issued</th><th>Issued</th><th>Given</th><th>Due</th><th>Days</th><th>Received</th><th>Penalty</th><th>Status</th><th>Action</th></tr></thead><tbody id="allLoanRows"></tbody></table></div></section></section>
+
+<section id="history" class="hidden"><section class="panel"><div class="panelhead"><div><h2>Loan History</h2><p>Payments and renewals recorded for your loans</p></div></div><div class="history" id="historyContent"></div></section></section>
+<section id="cleared" class="hidden"><section class="panel"><div class="panelhead"><div><h2>Cleared Loans</h2><p>Loans that have been fully repaid</p></div></div><div class="history" id="clearedContent"></div></section></section>
+<section id="farm" class="hidden"><section class="panel"><div class="panelhead farmhead"><div><h2>Farm Produce Reports</h2><p>Sales, expenses and profit/loss</p></div><div class="actions" style="padding:0"><button class="btn success" onclick="openSaleModal()">＋ Add Sale</button><button class="btn light" onclick="openExpenseModal()">＋ Add Expense</button></div></div><div class="history" id="farmReport"></div><div class="farm-record-grid"><section class="record-panel"><div class="record-head"><h3>Sales Records</h3><span class="record-total" id="salesRecordTotal">KSh 0</span></div><div class="tablewrap"><table class="table"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Action</th></tr></thead><tbody id="salesRows"></tbody></table></div></section><section class="record-panel"><div class="record-head"><h3>Expense Records</h3><span class="record-total" id="expenseRecordTotal">KSh 0</span></div><div class="tablewrap"><table class="table"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Action</th></tr></thead><tbody id="expenseRows"></tbody></table></div></section></div></section></section>
+<section id="settings" class="hidden"><section class="panel"><div class="panelhead"><div><h2>Settings</h2><p>Backup your browser data</p></div></div><div class="history"><button class="btn primary" onclick="exportData()">Export Backup</button> <button class="btn light" onclick="document.getElementById('importFile').click()">Import Backup</button><input id="importFile" type="file" accept=".json" hidden onchange="importData(event)"><div class="notice">Data is stored in Firebase. Export a backup as an extra safety copy if needed.</div><hr style="border:0;border-top:1px solid #e2ebf3;margin:22px 0"><h3 style="margin:0 0 6px">Business Profile Picture</h3><p style="margin:0 0 12px;color:#64748b;font-size:13px">Add a logo or profile picture for your business. It will appear in the dashboard header.</p><div class="profile-upload"><div class="profile-preview"><img id="settingsBusinessImage" alt="Business profile preview"><span id="settingsBusinessFallback">▥</span></div><div><input id="businessImageInput" type="file" accept="image/*"><div class="profile-actions"><button class="btn primary" type="button" onclick="uploadBusinessImage()">Save Picture</button><button class="btn light" type="button" onclick="removeBusinessImage()">Remove Picture</button></div><div id="profileImageStatus" class="profile-status"></div></div></div></div><hr style="border:0;border-top:1px solid #e2dbcf;margin:22px 0"><h3 style="margin:0 0 6px">Your Profile Picture</h3><p style="margin:0 0 12px;color:#64748b;font-size:13px">Add your photo. It will appear beside your Gmail in the dashboard header.</p><div class="profile-upload"><div class="profile-preview"><img id="settingsUserImage" alt="Your profile photo"><span id="settingsUserFallback">👤</span></div><div><input id="userImageInput" type="file" accept="image/*"><div class="profile-actions"><button class="btn primary" type="button" id="saveUserPhotoBtn" onclick="uploadUserImage()">Save My Photo</button><button class="btn light" type="button" onclick="removeUserImage()">Remove Photo</button></div><div id="userImageStatus" class="profile-status"></div></div></div></div></section></section>
+</main></div>
+
+<div class="modal" id="loanModal"><div class="modalbox"><div class="modalhead"><b id="loanModalTitle">Add New Loan</b><button class="close" onclick="closeModal('loanModal')">×</button></div><div class="modalbody"><form id="loanForm" class="form"><div class="formgrid"><div class="field"><label>Customer name</label><input id="customer" required></div><div class="field"><label>Phone number</label><input id="phone"></div><div class="field"><label>Borrower ID number</label><input id="borrowerIdNumber" placeholder="National ID number"></div><div class="field"><label>Borrower Firebase UID</label><input id="borrowerUid" placeholder="Paste borrower UID from Firebase"></div><div class="field"><label>Guarantor full name</label><input id="guarantorName" placeholder="Full name"></div><div class="field"><label>Guarantor phone number</label><input id="guarantorPhone" placeholder="Phone number"></div><div class="field"><label>Guarantor ID number</label><input id="guarantorIdNumber" placeholder="National ID number"></div><div class="field"><label>Guarantor relationship</label><input id="guarantorRelationship" placeholder="Relationship to borrower"></div><div class="field full"><label>Guarantor address / details</label><input id="guarantorAddress" placeholder="Address or other guarantor details"></div><div class="field"><label>Loan applied (requested)</label><input id="loanApplied" type="number" min="1" required oninput="syncIssued()"></div><div class="field"><label>Loan issued (approved)</label><input id="loanIssued" type="number" min="1" required oninput="calcGiven()"></div><div class="field"><label>Amount given (after 10%)</label><input id="givenAmount" readonly></div><div class="field"><label>Issue date</label><input id="issueDate" type="date" required></div><div class="field"><label>30-day due date</label><input id="dueDate" type="date" readonly></div><div class="field full"><label>Note</label><input id="loanNote" placeholder="Optional note"></div></div><div class="actions"><button class="btn success" type="submit">Save Loan</button><button class="btn light" type="button" onclick="closeModal('loanModal')">Cancel</button></div></form></div></div></div>
+
+<div class="modal" id="paymentModal"><div class="modalbox"><div class="modalhead"><b>Record Payment / Renewal</b><button class="close" onclick="closeModal('paymentModal')">×</button></div><div class="modalbody"><form id="paymentForm" class="form"><input id="paymentLoanId" type="hidden"><div id="paymentInfo"></div><div class="formgrid"><div class="field"><label>Amount received</label><input id="paymentAmount" type="number" min="0" required></div><div class="field"><label>Payment type</label><select id="paymentType" onchange="setPaymentAmount()"><option value="payment">Payment</option><option value="principal">Principal payment</option><option value="full">Full amount</option><option value="interest">Interest / Renewal (10% of current principal)</option><option value="other">Other amount</option></select></div><div class="field full"><label>Note</label><input id="paymentNote" placeholder="Optional note"></div></div><div class="notice">If this is a renewal, the system starts a new 30-day period and records the payment. The 10% deduction is not added again.</div><div class="actions"><button class="btn success" type="submit">Save Payment</button></div></form></div></div></div>
+
+<div class="modal" id="saleModal"><div class="modalbox"><div class="modalhead"><b>Record Farm Produce Sale</b><button class="close" onclick="closeModal('saleModal')">×</button></div><div class="modalbody"><form id="saleForm" class="form"><div class="formgrid"><div class="field"><label>Date</label><input id="saleDate" type="date" required></div><div class="field"><label>Sale amount</label><input id="saleAmount" type="number" min="0" required></div><div class="field full"><label>Description</label><input id="saleDesc" placeholder="e.g. produce sold"></div></div><div class="actions"><button class="btn success">Save Sale</button></div></form></div></div></div>
+
+<div class="modal" id="expenseModal"><div class="modalbox"><div class="modalhead"><b>Record Farm Produce Expense</b><button class="close" onclick="closeModal('expenseModal')">×</button></div><div class="modalbody"><form id="expenseForm" class="form"><div class="formgrid"><div class="field"><label>Date</label><input id="expenseDate" type="date" required></div><div class="field"><label>Expense amount</label><input id="expenseAmount" type="number" min="0" required></div><div class="field full"><label>Description</label><input id="expenseDesc" placeholder="e.g. chicken feed"></div></div><div class="actions"><button class="btn success">Save Expense</button></div></form></div></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,signOut,GoogleAuthProvider,signInWithPopup } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getDatabase,ref,get,set,update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyBrGrnRx38TtRtm238hiotuadwe0TEU4",
+  authDomain:"my-business-20c3c.firebaseapp.com",
+  databaseURL:"https://my-business-20c3c-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"my-business-20c3c",
+  storageBucket:"my-business-20c3c.firebasestorage.app",
+  messagingSenderId:"330366670031",
+  appId:"1:330366670031:web:9d99ec403936f1dcd453ba"
+};
+const firebaseReady=!Object.values(firebaseConfig).some(v=>String(v).includes("PASTE_"));
+let auth=null,db=null,currentUser=null;
+if(firebaseReady){const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getDatabase(app);}
+
+const KEY='myBusinessDashboard_v1';
+let data={loans:[],cleared:[],sales:[],expenses:[],profileImage:'',userProfileImage:''};
+const customer=document.getElementById('customer'), phone=document.getElementById('phone'), loanNote=document.getElementById('loanNote');
+const loanAmount=document.getElementById('loanAmount'), givenAmount=document.getElementById('givenAmount'), issueDate=document.getElementById('issueDate'), dueDate=document.getElementById('dueDate');
+const paymentLoanId=document.getElementById('paymentLoanId'), paymentAmount=document.getElementById('paymentAmount'), paymentNote=document.getElementById('paymentNote'), paymentInfo=document.getElementById('paymentInfo'), paymentType=document.getElementById('paymentType');
+function setPaymentAmount(){
+  const l=data.loans.find(x=>x.id===paymentLoanId.value);
+  if(!l)return;
+  const type=paymentType.value;
+  const outstanding=Math.max(0,Number(l.outstanding||l.amount||0));
+  if(type==='payment'||type==='full'){
+    paymentAmount.value=outstanding;
+    paymentAmount.readOnly=true;
+  }else if(type==='interest'){
+    paymentAmount.value=Math.round(outstanding*0.10*100)/100;
+    paymentAmount.readOnly=true;
+  }else{
+    paymentAmount.value='';
+    paymentAmount.readOnly=false;
+  }
+}
+const saleDate=document.getElementById('saleDate'), saleAmount=document.getElementById('saleAmount'), saleDesc=document.getElementById('saleDesc');
+const expenseDate=document.getElementById('expenseDate'), expenseAmount=document.getElementById('expenseAmount'), expenseDesc=document.getElementById('expenseDesc');
+const outstanding=document.getElementById('outstanding'), overdue=document.getElementById('overdue'), penalties=document.getElementById('penalties');
+const farmSales=document.getElementById('farmSales'), farmExpenses=document.getElementById('farmExpenses'), farmProfit=document.getElementById('farmProfit');
+const profitBox=document.getElementById('profitBox'), profitMessage=document.getElementById('profitMessage'), salesLabel=document.getElementById('salesLabel'), expenseLabel=document.getElementById('expenseLabel');
+const salesBar=document.getElementById('salesBar'), expenseBar=document.getElementById('expenseBar');
+const money=n=>'KSh '+Number(n||0).toLocaleString('en-KE',{maximumFractionDigits:2});
+const isoToday=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+const dateObj=s=>new Date(s+'T00:00:00');
+const addDays=(s,n)=>{let d=dateObj(s);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const fmt=s=>dateObj(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+async function save(){
+  const clean={loans:Array.isArray(data.loans)?data.loans:[],cleared:Array.isArray(data.cleared)?data.cleared:[],sales:Array.isArray(data.sales)?data.sales:[],expenses:Array.isArray(data.expenses)?data.expenses:[],profileImage:typeof data.profileImage==='string'?data.profileImage:'',userProfileImage:typeof data.userProfileImage==='string'?data.userProfileImage:''};
+  data=clean;
+  if(!db||!currentUser){localStorage.setItem(KEY,JSON.stringify(clean));render();return}
+  try{
+    await set(ref(db,'businessData'),clean);
+    localStorage.setItem(KEY,JSON.stringify(clean));
+    document.getElementById('cloudStatus').textContent='Cloud saved';
+    render();
+  }catch(e){
+    document.getElementById('cloudStatus').textContent='Cloud error';
+    alert('Could not save to Firebase: '+e.message);
+  }
+}
+// Loan rule: issue date is day 0. Day 1 is the following calendar day, so a 30-day loan issued on 23 Sep is due on 23 Oct.
+function loanDueDate(l){
+  if(!l)return '';
+  const history=Array.isArray(l.history)?l.history:[];
+  const hasRenewal=history.some(h=>String(h.type||'').toLowerCase().includes('renew'));
+  if(!hasRenewal && l.issueDate)return addDays(l.issueDate,30);
+  return l.dueDate|| (l.issueDate?addDays(l.issueDate,30):'');
+}
+function daysRemaining(due){
+  if(!due)return 0;
+  const today=dateObj(isoToday());
+  const dueDay=dateObj(due);
+  // The issue/due date itself is not counted as an elapsed day.
+  // A loan issued today with a 30-day term therefore shows 30 days remaining.
+  return Math.round((dueDay-today)/86400000);
+}
+function loanState(l){
+  const days=daysRemaining(loanDueDate(l));
+  if(days<0)return {days,status:'Overdue',cls:'overduebadge'};
+  if(days<=4)return {days,status:'Due Soon',cls:'pinkbadge'};
+  if(days<=19)return {days,status:'Due Soon',cls:'soonbadge'};
+  return {days,status:'Active',cls:'activebadge'};
+}
+function penalty(l){
+  const st=loanState(l);
+  return st.days<0 ? l.outstanding*0.01*Math.abs(st.days) : 0;
+}
+function totalReceived(){return [...data.loans,...data.cleared].reduce((a,l)=>a+(l.received||0),0)}
+function totalIssued(){return [...data.loans,...data.cleared].reduce((a,l)=>a+(Number(l.amount)||0),0)}
+function renderProfileImage(){
+  const src=data.profileImage||'';
+  const hi=document.getElementById('headerBusinessImage'), hf=document.getElementById('headerBusinessFallback');
+  const si=document.getElementById('settingsBusinessImage'), sf=document.getElementById('settingsBusinessFallback');
+  [hi,si].forEach(img=>{if(!img)return; img.src=src; img.classList.toggle('show',!!src)});
+  [hf,sf].forEach(el=>{if(el)el.classList.toggle('hide',!!src)});  const userSrc=data.userProfileImage||'';
+  const ui=document.getElementById('userProfileImage'), uf=document.getElementById('userAvatarFallback');
+  const sui=document.getElementById('settingsUserImage'), suf=document.getElementById('settingsUserFallback');
+  [ui,sui].forEach(img=>{if(!img)return; img.src=userSrc; img.classList.toggle('show',!!userSrc)});
+  [uf,suf].forEach(el=>{if(el)el.classList.toggle('hide',!!userSrc)});
+}
+
+function updateLiveDateTime(){
+  const now=new Date();
+  const dateEl=document.getElementById('todayText');
+  const greetingEl=document.querySelector('.user-chip b');
+  const fmt={timeZone:'Africa/Nairobi'};
+  const dateText=new Intl.DateTimeFormat('en-GB',{...fmt,weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(now);
+  const timeText=new Intl.DateTimeFormat('en-GB',{...fmt,hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
+  if(dateEl) dateEl.textContent=dateText+' • '+timeText;
+  if(greetingEl){
+    const hour=Number(new Intl.DateTimeFormat('en-GB',{...fmt,hour:'2-digit',hour12:false}).format(now));
+    greetingEl.textContent=hour<12?'Good Morning':hour<18?'Good Afternoon':'Good Evening';
+  }
+}
+function startLiveClock(){
+  updateLiveDateTime();
+  if(window._wimoClockTimer) clearInterval(window._wimoClockTimer);
+  window._wimoClockTimer=setInterval(updateLiveDateTime,60000);
+}
+function render(){
+  renderProfileImage();
+  updateLiveDateTime();
+  let issued=totalIssued(), rec=totalReceived(), out=data.loans.reduce((a,l)=>a+l.outstanding,0), over=data.loans.reduce((a,l)=>a+(loanState(l).days<0?l.outstanding:0),0), pen=data.loans.reduce((a,l)=>a+penalty(l),0);
+  const totalIssuedEl=document.getElementById('totalIssued'); const totalReceivedEl=document.getElementById('totalReceived');
+  totalIssuedEl.textContent=money(issued); totalReceivedEl.textContent=money(rec); outstanding.textContent=money(out); overdue.textContent=money(over); penalties.textContent=money(pen);
+  const rows=data.loans.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate)).map((l,i)=>loanRow(l,i)).join('');
+  document.getElementById('loanRows').innerHTML=rows||'<tr><td colspan="9" class="empty">No active loans yet.</td></tr>';
+  document.getElementById('allLoanRows').innerHTML=data.loans.map(l=>`<tr><td>${esc(l.customer)}</td><td>${esc(l.phone)}</td><td>${money(l.applied||l.amount)}</td><td>${money(l.amount)}</td><td>${fmt(l.issueDate)}</td><td>${money(l.given)}</td><td>${fmt(loanDueDate(l))}</td><td>${loanState(l).days}</td><td>${money(l.received)}</td><td>${money(penalty(l))}</td><td><span class="badge ${loanState(l).cls}">${loanState(l).status}</span></td><td><button class="btn light" onclick="openPayment('${l.id}')">Payment</button> <button class="btn danger" onclick="deleteLoan('${l.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="12" class="empty">No active loans.</td></tr>';
+  renderHistory(); renderCleared(); renderFarm();
+}
+function loanRow(l,index){let s=loanState(l);return `<tr><td>${index+1}</td><td><b>${esc(l.customer)}</b></td><td>${esc(l.phone)}</td><td>${money(l.applied||l.amount)}</td><td>${money(l.amount)}</td><td>${money(l.given)}</td><td>${s.days}</td><td><span class="badge ${s.cls}">${s.status}</span></td><td><button class="btn light" onclick="openPayment('${l.id}')">View</button> <button class="btn danger" onclick="deleteLoan('${l.id}')">Delete</button></td></tr>`}
+function esc(x){return String(x||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function openLoanModal(){document.getElementById('loanForm').reset();issueDate.value=isoToday();loanApplied.value='';loanIssued.value='';givenAmount.value='';calcGiven();document.getElementById('loanModal').classList.add('show')}
+function syncIssued(){loanIssued.value=loanApplied.value||'';calcGiven()}
+function calcGiven(){let a=Number(loanIssued.value||0);givenAmount.value=a?Math.round(a*.9*100)/100:'';if(issueDate.value)dueDate.value=addDays(issueDate.value,30)}
+issueDate?.addEventListener('change',()=>dueDate.value=addDays(issueDate.value,30));
+document.getElementById('loanForm').addEventListener('submit',async e=>{e.preventDefault();let applied=Number(loanApplied.value),amount=Number(loanIssued.value);if(!applied||!amount||amount<=0)return;let deducted=Math.round(amount*0.10*100)/100;let l={id:crypto.randomUUID(),customer:customer.value.trim(),phone:phone.value.trim(),borrowerIdNumber:borrowerIdNumber.value.trim(),guarantor:{name:guarantorName.value.trim(),phone:guarantorPhone.value.trim(),idNumber:guarantorIdNumber.value.trim(),relationship:guarantorRelationship.value.trim(),address:guarantorAddress.value.trim()},applied,amount,given:Number(givenAmount.value),deducted,issueDate:issueDate.value,dueDate:addDays(issueDate.value,30),outstanding:amount,received:deducted,borrowerUid:borrowerUid.value.trim(),note:loanNote.value,history:[{date:issueDate.value,amount:deducted,type:'initial deduction',note:'10% deducted and saved at loan issue'}]};data.loans.push(l);closeModal('loanModal'); await save(); if(borrowerUid.value.trim()&&db&&currentUser){ try{ await syncBorrowerLoan(l); }catch(e){ alert('Loan saved, but borrower portal could not be linked: '+e.message); } } });
+function openPayment(id){let l=data.loans.find(x=>x.id===id);if(!l)return;paymentLoanId.value=id;paymentNote.value='';paymentType.value='interest';paymentInfo.innerHTML=`<p><b>${esc(l.customer)}</b> — Loan issued ${money(l.amount)}, amount given ${money(l.given)}, outstanding ${money(l.outstanding)}, due ${fmt(loanDueDate(l))}.</p><p class="note">Full repayment fills the total outstanding automatically. Interest/renewal fills 10% of the loan issued automatically. Principal and Other are editable so you can enter the amount actually paid.</p>`;setPaymentAmount();document.getElementById('paymentModal').classList.add('show')}
+document.getElementById('paymentForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  let l=data.loans.find(x=>x.id===paymentLoanId.value), type=paymentType.value, amt=Number(paymentAmount.value);
+  if(!l)return;
+  const outstanding=Math.max(0,Number(l.outstanding||0));
+  if(type==='payment'||type==='full')amt=outstanding;
+  if(type==='interest')amt=Math.round(outstanding*0.10*100)/100;
+  if(!amt||amt<=0)return;
+  if((type==='principal'||type==='other')&&amt>outstanding){
+    alert(`Payment cannot be more than the outstanding principal of ${money(outstanding)}.`);
+    return;
+  }
+  if(type==='interest'){
+    l.received=(l.received||0)+amt;
+    // Renewal is anchored to the scheduled due date, not the date the interest was paid.
+    // Example: due 23rd, interest paid on 15th -> next due date is the 23rd + 30 days.
+    const oldDue=l.dueDate || isoToday();
+    l.dueDate=addDays(oldDue,30);
+    l.issueDate=oldDue;
+  }else{
+    l.outstanding=Math.max(0,outstanding-amt);
+    l.received=(l.received||0)+amt;
+  }
+  l.history.push({date:isoToday(),amount:amt,type,note:paymentNote.value});
+  if(l.outstanding<=0&&type!=='interest'){
+    l.outstanding=0;
+    l.clearedAt=isoToday();
+    data.cleared.push(l);
+    data.loans=data.loans.filter(x=>x.id!==l.id);
+  }
+  closeModal('paymentModal');
+  syncBorrowerLoan(l).then(()=>save());
+});
+async function syncBorrowerLoan(l){ if(!db||!l||!l.borrowerUid||!currentUser||currentUser.uid!==OWNER_UID)return; const uid=l.borrowerUid.trim(); const payload={name:l.customer,phone:l.phone,idNumber:l.borrowerIdNumber||'',guarantor:{name:l.guarantor?.name||'',phone:l.guarantor?.phone||'',idNumber:l.guarantor?.idNumber||'',relationship:l.guarantor?.relationship||'',address:l.guarantor?.address||''},loan:{id:l.id,amount:Number(l.amount||0),given:Number(l.given||0),outstanding:Number(l.outstanding||0),interestToPay:Math.round(Math.max(0,Number(l.outstanding||0))*0.10*100)/100,dueDate:l.dueDate||''}}; await set(ref(db,'borrowers/'+uid),payload); }
+function deleteLoan(id){let l=data.loans.find(x=>x.id===id);if(!l)return;if(confirm(`Permanently delete ${l.customer}'s loan? This cannot be undone.`)){data.loans=data.loans.filter(x=>x.id!==id);save()}}
+function renderHistory(){let all=[...data.loans,...data.cleared].flatMap(l=>(l.history||[]).map(h=>({...h,customer:l.customer}))).sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('historyContent').innerHTML=all.length?`<table class="table"><thead><tr><th>Date</th><th>Customer</th><th>Amount</th><th>Type</th><th>Note</th></tr></thead><tbody>${all.map(h=>`<tr><td>${fmt(h.date)}</td><td>${esc(h.customer)}</td><td>${money(h.amount)}</td><td>${esc(h.type)}</td><td>${esc(h.note)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No payments or renewals recorded yet.</div>'}
+function renderCleared(){document.getElementById('clearedContent').innerHTML=data.cleared.length?`<table class="table"><thead><tr><th>Customer</th><th>Loan</th><th>Issued</th><th>Cleared</th><th>Total Received</th></tr></thead><tbody>${data.cleared.slice().sort((a,b)=>String(b.clearedAt||'').localeCompare(String(a.clearedAt||''))).map(l=>`<tr><td>${esc(l.customer)}</td><td>${money(l.amount)}</td><td>${fmt(l.issueDate)}</td><td>${fmt(l.clearedAt||isoToday())}</td><td>${money(l.received)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No cleared loans yet.</div>'}
+function openSaleModal(){document.getElementById('saleForm').reset();saleDate.value=isoToday();document.getElementById('saleModal').classList.add('show')}
+function openExpenseModal(){document.getElementById('expenseForm').reset();expenseDate.value=isoToday();document.getElementById('expenseModal').classList.add('show')}
+document.getElementById('saleForm').addEventListener('submit',e=>{e.preventDefault();data.sales.push({id:crypto.randomUUID(),date:saleDate.value,amount:Number(saleAmount.value),desc:saleDesc.value});closeModal('saleModal');save()});
+document.getElementById('expenseForm').addEventListener('submit',e=>{e.preventDefault();data.expenses.push({id:crypto.randomUUID(),date:expenseDate.value,amount:Number(expenseAmount.value),desc:expenseDesc.value});closeModal('expenseModal');save()});
+function renderFarm(){let s=data.sales.reduce((a,x)=>a+x.amount,0),e=data.expenses.reduce((a,x)=>a+x.amount,0),p=s-e;farmSales.textContent=money(s);farmExpenses.textContent=money(e);farmProfit.textContent=money(p);profitBox.textContent=money(p);const positive=p>0,negative=p<0;farmProfit.classList.toggle('profit-positive',positive);farmProfit.classList.toggle('profit-negative',negative);profitBox.classList.toggle('profit-positive',positive);profitBox.classList.toggle('profit-negative',negative);profitMessage.textContent=positive?'Your farm is making a profit!':negative?'Your farm is currently making a loss.':'Sales and expenses are currently equal.';profitMessage.classList.toggle('profit-positive',positive);profitMessage.classList.toggle('profit-negative',negative);salesLabel.textContent=money(s);expenseLabel.textContent=money(e);const maxBar=Math.max(s,e,1);const salesBar=document.getElementById('farmSalesBar');const expenseBar=document.getElementById('farmExpenseBar');if(salesBar)salesBar.style.height=(s/maxBar*100)+'%';if(expenseBar)expenseBar.style.height=(e/maxBar*100)+'%';document.getElementById('farmReport').innerHTML=`<p><b>Total sales:</b> ${money(s)}</p><p><b>Total expenses:</b> ${money(e)}</p><p><b>Profit/Loss:</b> <span class="${positive?'profit-positive':negative?'profit-negative':''}">${money(p)}</span></p><hr><p><b>Recorded sales:</b> ${data.sales.length}</p><p><b>Recorded expenses:</b> ${data.expenses.length}</p>`;document.getElementById('salesRecordTotal').textContent=money(s);document.getElementById('expenseRecordTotal').textContent=money(e);document.getElementById('salesRows').innerHTML=data.sales.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${fmt(x.date)}</td><td>${esc(x.desc||'Farm produce sale')}</td><td>${money(x.amount)}</td><td><button class="btn danger" onclick="deleteSale('${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">No sales recorded yet.</td></tr>';document.getElementById('expenseRows').innerHTML=data.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${fmt(x.date)}</td><td>${esc(x.desc||'Farm expense')}</td><td>${money(x.amount)}</td><td><button class="btn danger" onclick="deleteExpense('${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">No expenses recorded yet.</td></tr>'} 
+function deleteSale(id){let x=data.sales.find(s=>s.id===id);if(!x)return;if(confirm(`Permanently delete this sale of ${money(x.amount)}? This cannot be undone.`)){data.sales=data.sales.filter(s=>s.id!==id);save()}}
+function deleteExpense(id){let x=data.expenses.find(e=>e.id===id);if(!x)return;if(confirm(`Permanently delete this expense of ${money(x.amount)}? This cannot be undone.`)){data.expenses=data.expenses.filter(e=>e.id!==id);save()}}
+function showPage(id,btn){document.querySelectorAll('main>section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');render()}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+function exportData(){let blob=new Blob([JSON.stringify({loans:data.loans,cleared:data.cleared,sales:data.sales,expenses:data.expenses,profileImage:data.profileImage||'',userProfileImage:data.userProfileImage||''},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='business-dashboard-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(x.loans&&x.sales&&x.expenses){data={loans:Array.isArray(x.loans)?x.loans:[],cleared:Array.isArray(x.cleared)?x.cleared:[],sales:Array.isArray(x.sales)?x.sales:[],expenses:Array.isArray(x.expenses)?x.expenses:[],profileImage:typeof x.profileImage==='string'?x.profileImage:'',userProfileImage:typeof x.userProfileImage==='string'?x.userProfileImage:''};data.cleared=[...data.cleared,...data.loans.filter(l=>Number(l.outstanding)<=0).map(l=>({...l,clearedAt:l.clearedAt||isoToday()}))];data.loans=data.loans.filter(l=>Number(l.outstanding)>0);save();alert('Backup imported successfully to the cloud.')}else alert('Invalid backup file.')}catch{alert('Could not read backup file.')}};r.readAsText(f)}
+
+async function uploadBusinessImage(){
+  const input=document.getElementById('businessImageInput');
+  const file=input.files&&input.files[0];
+  if(!file){document.getElementById('profileImageStatus').textContent='Choose an image first.';return}
+  if(!file.type.startsWith('image/')){document.getElementById('profileImageStatus').textContent='Please choose an image file.';return}
+  try{
+    const dataUrl=await resizeImage(file,420,420,0.82);
+    data.profileImage=dataUrl;
+    await save();
+    document.getElementById('profileImageStatus').textContent='Business picture saved.';
+    input.value='';
+  }catch(e){document.getElementById('profileImageStatus').textContent='Could not save the picture.'}
+}
+function resizeImage(file,maxW,maxH,quality){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onerror=()=>reject(new Error('Could not read the image'));
+    r.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error('Could not load the image'));
+      img.onload=()=>{
+        try{
+          let w=img.width,h=img.height,scale=Math.min(1,maxW/w,maxH/h);
+          w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));
+          const c=document.createElement('canvas');c.width=w;c.height=h;
+          const ctx=c.getContext('2d');
+          if(!ctx) throw new Error('Canvas unavailable');
+          ctx.drawImage(img,0,0,w,h);
+          const out=c.toDataURL('image/jpeg',quality);
+          if(!out||out==='data:,') throw new Error('Image conversion failed');
+          resolve(out);
+        }catch(e){reject(e)}
+      };
+      img.src=r.result;
+    };
+    r.readAsDataURL(file);
+  })
+}
+async function uploadUserImage(){
+  const input=document.getElementById('userImageInput');
+  const status=document.getElementById('userImageStatus');
+  const button=document.getElementById('saveUserPhotoBtn');
+  const file=input && input.files ? input.files[0] : null;
+  if(!file){ if(status) status.textContent='Please choose your photo first.'; return; }
+  if(!file.type || !file.type.startsWith('image/')){ if(status) status.textContent='Please choose a valid image file.'; return; }
+  const oldText=button ? button.textContent : 'Save My Photo';
+  try{
+    if(button){ button.disabled=true; button.textContent='Saving…'; }
+    if(status) status.textContent='Preparing photo…';
+    const dataUrl=await resizeImage(file,240,240,0.82);
+    if(!dataUrl) throw new Error('Photo conversion failed');
+
+    data.userProfileImage=dataUrl;
+    localStorage.setItem(KEY,JSON.stringify(data));
+    renderProfileImage();
+
+    // Save the profile photo directly to its own Firebase field. This prevents the
+    // large dashboard object from blocking the photo from being saved.
+    if(db && currentUser && currentUser.uid===OWNER_UID){
+      if(status) status.textContent='Saving photo to cloud…';
+      await set(ref(db,'businessData/userProfileImage'),dataUrl);
+      document.getElementById('cloudStatus').textContent='Cloud saved';
+    }
+    if(status) status.textContent='✓ Your profile photo is saved.';
+    if(input) input.value='';
+  }catch(err){
+    console.error('Profile photo save failed:',err);
+    if(status) status.textContent='Could not save the photo: '+(err?.message||'Please try again.');
+  }finally{
+    if(button){ button.disabled=false; button.textContent=oldText; }
+  }
+}
+async function removeUserImage(){
+  try{
+    data.userProfileImage='';
+    localStorage.setItem(KEY,JSON.stringify(data));
+    renderProfileImage();
+    if(db && currentUser && currentUser.uid===OWNER_UID){
+      await set(ref(db,'businessData/userProfileImage'),'');
+    }
+    document.getElementById('userImageStatus').textContent='Profile photo removed.';
+  }catch(err){
+    document.getElementById('userImageStatus').textContent='Could not remove the photo: '+(err?.message||'Please try again.');
+  }
+}
+async function removeBusinessImage(){
+  data.profileImage='';
+  await save();
+  document.getElementById('profileImageStatus').textContent='Business picture removed.';
+}
+
+const OWNER_UID='mCNUzyMy6zZ5IVZ7ijUDynuMQI63';
+const authMsg=document.getElementById('authMsg');
+function showAuthMsg(msg){authMsg.textContent=msg;authMsg.classList.add('show')}
+function clearAuthMsg(){authMsg.textContent='';authMsg.classList.remove('show')}
+
+Object.assign(window,{showPage,openLoanModal,calcGiven,openPayment,deleteLoan,openSaleModal,openExpenseModal,deleteSale,deleteExpense,closeModal,exportData,importData,uploadBusinessImage,removeBusinessImage,uploadUserImage,removeUserImage});
+
+async function loadCloudData(){
+  if(!db)return;
+  document.getElementById('cloudStatus').textContent='Loading cloud…';
+  try{
+    const snap=await get(ref(db,'businessData'));
+    if(snap.exists()){
+      const cloud=snap.val()||{};
+      data={loans:Array.isArray(cloud.loans)?cloud.loans:[],cleared:Array.isArray(cloud.cleared)?cloud.cleared:[],sales:Array.isArray(cloud.sales)?cloud.sales:[],expenses:Array.isArray(cloud.expenses)?cloud.expenses:[],profileImage:typeof cloud.profileImage==='string'?cloud.profileImage:'',userProfileImage:typeof cloud.userProfileImage==='string'?cloud.userProfileImage:''};
+      data.loans=data.loans.filter(l=>Number(l.outstanding)>0);
+      await set(ref(db,'businessData'),data);
+      localStorage.setItem(KEY,JSON.stringify(data));
+      document.getElementById('cloudStatus').textContent='Cloud connected';
+    }else{
+      const old=localStorage.getItem(KEY);
+      if(old){
+        const oldData=JSON.parse(old);
+        if(confirm('Firebase is empty. Copy the data currently saved in this browser to the cloud?')){
+          data={loans:Array.isArray(oldData.loans)?oldData.loans.filter(l=>Number(l.outstanding)>0):[],cleared:Array.isArray(oldData.cleared)?oldData.cleared:[],sales:Array.isArray(oldData.sales)?oldData.sales:[],expenses:Array.isArray(oldData.expenses)?oldData.expenses:[],profileImage:typeof oldData.profileImage==='string'?oldData.profileImage:'',userProfileImage:typeof oldData.userProfileImage==='string'?oldData.userProfileImage:''};
+          await set(ref(db,'businessData'),data); localStorage.setItem(KEY,JSON.stringify(data)); document.getElementById('cloudStatus').textContent='Cloud saved';
+        }
+      }else document.getElementById('cloudStatus').textContent='Cloud connected';
+    }
+    render();
+  }catch(e){document.getElementById('cloudStatus').textContent='Cloud error';showAuthMsg('Could not load your cloud data: '+e.message)}
+}
+
+function updateBorrowerPortalTime(){
+  const el=document.getElementById('borrowerPortalTime');
+  if(!el)return;
+  const now=new Date();
+  const fmt={timeZone:'Africa/Nairobi',weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false};
+  el.textContent=new Intl.DateTimeFormat('en-GB',fmt).format(now);
+}
+function startBorrowerPortalClock(){
+  updateBorrowerPortalTime();
+  if(window._wimoBorrowerClockTimer)clearInterval(window._wimoBorrowerClockTimer);
+  window._wimoBorrowerClockTimer=setInterval(updateBorrowerPortalTime,60000);
+}
+
+async function checkBorrowerPortal(user){
+  if(!db||!user)return false;
+  try{
+    const snap=await get(ref(db,'borrowers/'+user.uid));
+    if(!snap.exists())return false;
+    const b=snap.val()||{};
+    document.getElementById('authScreen').style.display='none';
+    document.getElementById('app').style.display='none';
+    const portal=document.getElementById('borrowerPortal'); portal.style.display='block'; startBorrowerPortalClock();
+    const loan=b.loan||{};
+    const outstanding=Math.max(0,Number(loan.outstanding||0));
+    const interestToPay=Math.round(outstanding*0.10*100)/100;
+    const due=loan.dueDate||'';
+    const days=due?Math.ceil((new Date(due+'T00:00:00')-new Date(new Date().toISOString().slice(0,10)+'T00:00:00'))/86400000):0;
+    const status=outstanding<=0?'Cleared':days<0?'Overdue':'Active';
+    const g=b.guarantor||{}; document.getElementById('borrowerContent').innerHTML=`<h2 style="margin:0 0 14px">Hello, ${esc(b.name||user.email||'Borrower')}</h2><div class="cards borrower-loan-cards"><div class="card"><div class="label">Loan Amount</div><div class="value">${money(loan.amount)}</div></div><div class="card"><div class="label">Amount Repaid</div><div class="value">${money(Math.max(0,Number(loan.amount||0)-outstanding))}</div></div><div class="card"><div class="label">Loan Balance / Principal to Pay</div><div class="value">${money(outstanding)}</div></div><div class="card interest-card"><div class="label">Interest to Pay (10%)</div><div class="value">${money(interestToPay)}</div></div><div class="card"><div class="label">Due Date</div><div class="value">${due?fmt(due):'—'}</div></div><div class="card"><div class="label">Days Remaining</div><div class="value">${days}</div></div></div><div class="interest-note"><b>Important:</b> Interest is 10% of the current outstanding principal. Paying interest does not reduce the principal. If part of the principal is paid, the interest is recalculated on the new principal balance.</div><div class="info-panels"><div class="panel" style="margin-top:16px"><h3>My Personal Details</h3><p><b>Name:</b> ${esc(b.name||'')}</p><p><b>Phone:</b> ${esc(b.phone||'')}</p><p><b>ID number:</b> ${esc(b.idNumber||'')}</p></div><div class="panel" style="margin-top:16px"><h3>Guarantor Details</h3><p><b>Name:</b> ${esc(g.name||'')}</p><p><b>Phone:</b> ${esc(g.phone||'')}</p><p><b>ID number:</b> ${esc(g.idNumber||'')}</p><p><b>Relationship:</b> ${esc(g.relationship||'')}</p><p><b>Address / details:</b> ${esc(g.address||'')}</p></div><div class="panel" style="margin-top:16px"><h3>My Loan Details</h3><p><b>Due date:</b> ${due?fmt(due):'—'}</p><p><b>Days remaining:</b> ${days}</p><p><b>Status:</b> <span class="badge ${status==='Overdue'?'red':status==='Cleared'?'green':'yellow'}">${status}</span></p></div></div>`;
+    return true;
+  }catch(e){console.error(e); showAuthMsg('Borrower portal could not be loaded: '+e.message); return false}
+}
+document.getElementById('borrowerLogout').addEventListener('click',()=>signOut(auth));
+
+document.getElementById('loginBtn').addEventListener('click',async()=>{
+  clearAuthMsg(); const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
+  if(!email||!password){showAuthMsg('Enter your email and password.');return}
+  try{await signInWithEmailAndPassword(auth,email,password)}catch(e){showAuthMsg(e.message)}
+});
+document.getElementById('signupBtn').addEventListener('click',async()=>{
+  clearAuthMsg(); const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
+  if(!email||!password){showAuthMsg('Enter an email and a password of at least 6 characters.');return}
+  try{await createUserWithEmailAndPassword(auth,email,password)}catch(e){showAuthMsg(e.message)}
+});
+document.getElementById('resetBtn').addEventListener('click',async()=>{
+  clearAuthMsg(); const email=document.getElementById('authEmail').value.trim();
+  if(!email){showAuthMsg('Enter your email address first.');return}
+  try{await sendPasswordResetEmail(auth,email);showAuthMsg('Password reset email sent. Check your inbox.')}catch(e){showAuthMsg(e.message)}
+});
+document.getElementById('googleBtn').addEventListener('click',async()=>{
+  clearAuthMsg();
+  try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){showAuthMsg(e.message)}
+});
+document.getElementById('logoutBtn').addEventListener('click',()=>signOut(auth));
+
+if(firebaseReady){
+  onAuthStateChanged(auth,async user=>{
+    currentUser=user; document.getElementById('userEmailTop').textContent=user?.email||'User';
+    document.getElementById('authScreen').style.display=user?'none':'flex';
+    document.getElementById('app').style.display=user?'block':'none';
+    if(user){ if(user.uid===OWNER_UID){ await loadCloudData(); } else { const isBorrower=await checkBorrowerPortal(user); if(!isBorrower){ document.getElementById('authScreen').style.display='flex'; document.getElementById('app').style.display='none'; showAuthMsg('This account is not linked to a borrower portal yet. Please contact the owner.'); await signOut(auth); } } }
+  });
+}else{
+  showAuthMsg('Firebase configuration is incomplete.');
+}
+render();
+startLiveClock();
+</script>
+</div>
+</body>
+</html>
